@@ -27,5 +27,14 @@ public class MovieConfiguration : IEntityTypeConfiguration<Movie>
               builder.HasMany(m => m.MovieGenres)
                      .WithOne(mg => mg.Movie)
                      .HasForeignKey(mg => mg.MovieId);
+
+              builder.HasOne(m => m.Director)
+                     .WithMany(d => d.Movies)
+                     .HasForeignKey(m => m.DirectorId)
+                     .OnDelete(DeleteBehavior.Restrict);
+
+              builder.HasMany(m => m.MovieActors)
+                     .WithOne(ma => ma.Movie)
+                     .HasForeignKey(ma => ma.MovieId);
        }
 }

@@ -17,4 +17,9 @@ public class MovieWriteRepository : WriteRepository<Movie>, IMovieWriteRepositor
     {
         _context.MovieGenres.RemoveRange(movie.MovieGenres);
     }
+
+    public void RemoveMovieActors(Movie movie)
+    {
+        _context.MovieActors.RemoveRange(movie.MovieActors);
+    }
 }

@@ -9,6 +9,10 @@ public class Movie : BaseEntity
     public int ReleaseYear { get; set; }
     public double Rating { get; set; }
 
+    public string DirectorId { get; set; } = null!;
+    public Director Director { get; set; } = null!;
+
     // Navigation
     public ICollection<MovieGenre> MovieGenres { get; set; } = new List<MovieGenre>();
+    public ICollection<MovieActor> MovieActors { get; set; } = new List<MovieActor>();
 }

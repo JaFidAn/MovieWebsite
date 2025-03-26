@@ -7,5 +7,7 @@ public class CreateMovieDto
     public int ReleaseYear { get; set; }
     public double Rating { get; set; }
 
+    public string DirectorId { get; set; } = null!;
     public List<string> GenreIds { get; set; } = new();
+    public List<string> ActorIds { get; set; } = new();
 }

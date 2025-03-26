@@ -38,6 +38,7 @@ public class DeleteMovie
             }
 
             _movieWriteRepository.RemoveMovieGenres(movie);
+            _movieWriteRepository.RemoveMovieActors(movie);
 
             movie.IsDeleted = true;
 
