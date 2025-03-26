@@ -37,4 +37,10 @@ public class MoviesController : BaseApiController
     {
         return HandleResult(await Mediator.Send(new DeleteMovie.Command { Id = id }));
     }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<PagedResult<MovieSearchResultDto>>> Search([FromQuery] MovieSearchParams queryParams)
+    {
+        return await Mediator.Send(new GetMovieSearchResults.Query { Params = queryParams });
+    }
 }
