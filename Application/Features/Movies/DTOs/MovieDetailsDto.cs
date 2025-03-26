@@ -1,6 +1,6 @@
 namespace Application.Features.Movies.DTOs;
 
-public class EditMovieDto
+public class MovieDetailsDto
 {
     public string Id { get; set; } = null!;
     public string Title { get; set; } = null!;
@@ -8,7 +8,7 @@ public class EditMovieDto
     public int ReleaseYear { get; set; }
     public double Rating { get; set; }
 
-    public string DirectorId { get; set; } = null!;
-    public List<string> GenreIds { get; set; } = new();
-    public List<string> ActorIds { get; set; } = new();
+    public string Director { get; set; } = null!;
+    public List<string> Genres { get; set; } = new();
+    public List<string> Actors { get; set; } = new();
 }

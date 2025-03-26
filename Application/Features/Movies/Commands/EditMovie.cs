@@ -2,6 +2,7 @@ using Application.Core;
 using Application.Features.Movies.DTOs;
 using Application.Repositories.MovieRepository;
 using Application.Repositories.GenreRepository;
+using Application.Repositories.ActorRepository;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -21,17 +22,20 @@ public class EditMovie
         private readonly IMovieReadRepository _movieReadRepository;
         private readonly IMovieWriteRepository _movieWriteRepository;
         private readonly IGenreReadRepository _genreReadRepository;
+        private readonly IActorReadRepository _actorReadRepository;
         private readonly IMapper _mapper;
 
         public Handler(
             IMovieReadRepository movieReadRepository,
             IMovieWriteRepository movieWriteRepository,
             IGenreReadRepository genreReadRepository,
+            IActorReadRepository actorReadRepository,
             IMapper mapper)
         {
             _movieReadRepository = movieReadRepository;
             _movieWriteRepository = movieWriteRepository;
             _genreReadRepository = genreReadRepository;
+            _actorReadRepository = actorReadRepository;
             _mapper = mapper;
         }
 
@@ -40,6 +44,7 @@ public class EditMovie
             var movie = await _movieReadRepository
                 .GetWhere(m => m.Id == request.MovieDto.Id && !m.IsDeleted)
                 .Include(m => m.MovieGenres)
+                .Include(m => m.MovieActors)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (movie is null)
@@ -56,19 +61,27 @@ public class EditMovie
                 return Result<Unit>.Failure("One or more genres are invalid", 400);
             }
 
+            var actors = await _actorReadRepository
+                .GetWhere(a => request.MovieDto.ActorIds.Contains(a.Id) && !a.IsDeleted)
+                .ToListAsync(cancellationToken);
+
+            if (actors.Count != request.MovieDto.ActorIds.Count)
+            {
+                return Result<Unit>.Failure("One or more actors are invalid", 400);
+            }
+
             _movieWriteRepository.RemoveMovieGenres(movie);
+            _movieWriteRepository.RemoveMovieActors(movie);
+
+            _mapper.Map(request.MovieDto, movie);
 
             movie.MovieGenres = request.MovieDto.GenreIds
-                .Select(genreId => new MovieGenre
-                {
-                    MovieId = movie.Id,
-                    GenreId = genreId
-                }).ToList();
+                .Select(id => new MovieGenre { MovieId = movie.Id, GenreId = id })
+                .ToList();
 
-            movie.Title = request.MovieDto.Title;
-            movie.Description = request.MovieDto.Description;
-            movie.ReleaseYear = request.MovieDto.ReleaseYear;
-            movie.Rating = request.MovieDto.Rating;
+            movie.MovieActors = request.MovieDto.ActorIds
+                .Select(id => new MovieActor { MovieId = movie.Id, ActorId = id })
+                .ToList();
 
             var result = await _movieWriteRepository.SaveAsync() > 0;
 

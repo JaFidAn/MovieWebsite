@@ -15,7 +15,7 @@ public class MoviesController : BaseApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<MovieDto>> GetDetail(string id)
+    public async Task<ActionResult<MovieDetailsDto>> GetDetail(string id)
     {
         return HandleResult(await Mediator.Send(new GetMovieDetails.Query { Id = id }));
     }
