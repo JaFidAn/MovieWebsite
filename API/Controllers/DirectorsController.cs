@@ -2,18 +2,21 @@ using Application.Core;
 using Application.Features.Directors.Commands;
 using Application.Features.Directors.DTOs;
 using Application.Features.Directors.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 public class DirectorsController : BaseApiController
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PagedResult<DirectorDto>>> GetAll([FromQuery] PaginationParams paginationParams)
     {
         return await Mediator.Send(new GetDirectorList.Query { Params = paginationParams });
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<DirectorDto>> GetDetail(string id)
     {

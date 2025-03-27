@@ -1,9 +1,12 @@
 using Application.Core;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Dynamic;
 
 namespace API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BaseApiController : ControllerBase
@@ -18,37 +21,45 @@ namespace API.Controllers
         {
             if (!result.IsSuccess)
             {
-                // Not Found
                 if (result.Code == 404)
                     return NotFound(new { message = result.Error, code = result.Code });
 
-                // General Bad Request
                 return BadRequest(new { message = result.Error, code = result.Code });
             }
 
             var type = typeof(T);
 
-            // Success (Unit) with message
             if (type == typeof(Unit))
                 return Ok(new { message = result.Message });
 
-            // Success with simple types (id)
             if (type == typeof(string) || type == typeof(Guid) || type == typeof(int))
-                return Ok(new { id = result.Value, message = result.Message });
-
-            // Success with DTOs (GET requests)
-            if (result.Message == null)
             {
-                return Ok(result.Value); // Just return the object directly
+                var actionName = ControllerContext.ActionDescriptor.ActionName?.ToLower();
+
+                var key = actionName switch
+                {
+                    "login" => "token",
+                    "register" => "token",
+                    _ => "id"
+                };
+
+                dynamic obj = new ExpandoObject();
+                ((IDictionary<string, object>)obj)[key] = result.Value!;
+                obj.message = result.Message;
+
+                return Ok(obj);
             }
 
-            // Otherwise return data and message
+            if (result.Message == null)
+            {
+                return Ok(result.Value);
+            }
+
             return Ok(new
             {
                 data = result.Value,
                 message = result.Message
             });
         }
-
     }
 }
