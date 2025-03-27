@@ -10,12 +10,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Text;
 using Domain.Entities;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Application, Infrastructure, Persistence services
+// Application, Infrastructure, Persistence
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
@@ -56,6 +58,25 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Rate Limiting Configuration
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("fixed", context => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: context.Connection.RemoteIpAddress,
+        factory: partition => new FixedWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1)
+        }));
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        await context.HttpContext.Response.WriteAsync("Too many requests. Please try later again... ", cancellationToken: token);
+    };
+});
+
 builder.Services.AddControllers();
 
 // Swagger
@@ -75,7 +96,13 @@ if (app.Environment.IsDevelopment())
 // Global Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// 🔐 Token Blacklist Middleware
+// HTTPS Redirect
+app.UseHttpsRedirection();
+
+// Rate Limiter
+app.UseRateLimiter();
+
+// Token Blacklist Middleware
 app.UseMiddleware<TokenBlacklistMiddleware>();
 
 // Authentication & Authorization
