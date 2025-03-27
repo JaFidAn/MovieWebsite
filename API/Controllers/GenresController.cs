@@ -2,18 +2,21 @@ using Application.Core;
 using Application.Features.Genres.Commands;
 using Application.Features.Genres.DTOs;
 using Application.Features.Genres.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 public class GenresController : BaseApiController
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PagedResult<GenreDto>>> GetAll([FromQuery] PaginationParams paginationParams)
     {
         return await Mediator.Send(new GetGenreList.Query { Params = paginationParams });
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<GenreDto>> GetDetail(string id)
     {

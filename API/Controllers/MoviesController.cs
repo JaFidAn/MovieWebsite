@@ -2,18 +2,21 @@ using Application.Core;
 using Application.Features.Movies.Commands;
 using Application.Features.Movies.DTOs;
 using Application.Features.Movies.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 public class MoviesController : BaseApiController
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PagedResult<MovieDto>>> GetAll([FromQuery] PaginationParams paginationParams)
     {
         return await Mediator.Send(new GetMovieList.Query { Params = paginationParams });
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<MovieDetailsDto>> GetDetail(string id)
     {

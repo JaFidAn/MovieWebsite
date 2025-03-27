@@ -2,18 +2,21 @@ using Application.Core;
 using Application.Features.Actors.Commands;
 using Application.Features.Actors.DTOs;
 using Application.Features.Actors.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 public class ActorsController : BaseApiController
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<PagedResult<ActorDto>>> GetAll([FromQuery] PaginationParams paginationParams)
     {
         return await Mediator.Send(new GetActorList.Query { Params = paginationParams });
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<ActorDto>> GetDetail(string id)
     {
