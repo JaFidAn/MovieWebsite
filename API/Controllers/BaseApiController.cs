@@ -2,10 +2,12 @@ using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Dynamic;
 
 namespace API.Controllers
 {
+    [EnableRateLimiting("fixed")]
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
