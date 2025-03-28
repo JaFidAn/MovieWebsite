@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Genres.DTOs;
 using Application.Repositories.GenreRepository;
+using Application.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -39,7 +40,7 @@ public class CreateGenre
 
             if (existing is not null)
             {
-                return Result<string>.Failure("Genre with the same name already exists", 400);
+                return Result<string>.Failure(MessageGenerator.DuplicateExists("Genre"), 400);
             }
 
             var genre = _mapper.Map<Genre>(request.GenreDto);
@@ -49,10 +50,10 @@ public class CreateGenre
 
             if (!result)
             {
-                return Result<string>.Failure("Genre could not be created", 400);
+                return Result<string>.Failure(MessageGenerator.CreationFailed("Genre"), 400);
             }
 
-            return Result<string>.Success(genre.Id, "Genre added successfully");
+            return Result<string>.Success(genre.Id, MessageGenerator.CreationSuccess("Genre"));
         }
     }
 }

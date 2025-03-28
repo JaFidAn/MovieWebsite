@@ -1,5 +1,6 @@
 using Application.Core;
 using Application.Repositories.GenreRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ public class DeleteGenre
 
             if (genre is null)
             {
-                return Result<Unit>.Failure("Genre not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Genre"), 404);
             }
 
             genre.IsDeleted = true;
@@ -42,10 +43,10 @@ public class DeleteGenre
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to delete genre", 400);
+                return Result<Unit>.Failure(MessageGenerator.DeletionFailed("Genre"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Genre deleted successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.DeletionSuccess("Genre"));
         }
     }
 }

@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Auth.DTOs;
 using Application.Services;
+using Application.Utilities;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -35,16 +36,16 @@ public class Login
             var user = await _userManager.FindByEmailAsync(request.LoginDto.Email);
 
             if (user is null)
-                return Result<string>.Failure("Invalid email or password", 401);
+                return Result<string>.Failure(MessageGenerator.InvalidCredentials(), 401);
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.LoginDto.Password, false);
 
             if (!result.Succeeded)
-                return Result<string>.Failure("Invalid email or password", 401);
+                return Result<string>.Failure(MessageGenerator.InvalidCredentials(), 401);
 
             var token = await _tokenService.CreateToken(user);
 
-            return Result<string>.Success(token, "Login successful");
+            return Result<string>.Success(token, MessageGenerator.LoginSuccess());
         }
     }
 }

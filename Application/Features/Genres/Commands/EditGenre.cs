@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Genres.DTOs;
 using Application.Repositories.GenreRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ public class EditGenre
 
             if (genre is null)
             {
-                return Result<Unit>.Failure("Genre not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Genre"), 404);
             }
 
             var duplicate = await _genreReadRepository
@@ -41,7 +42,7 @@ public class EditGenre
 
             if (duplicate is not null)
             {
-                return Result<Unit>.Failure("Another genre with the same name already exists", 400);
+                return Result<Unit>.Failure(MessageGenerator.DuplicateExists("Genre"), 400);
             }
 
             genre.Name = request.GenreDto.Name;
@@ -50,10 +51,10 @@ public class EditGenre
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to update genre", 400);
+                return Result<Unit>.Failure(MessageGenerator.UpdateFailed("Genre"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Genre updated successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.UpdateSuccess("Genre"));
         }
     }
 }

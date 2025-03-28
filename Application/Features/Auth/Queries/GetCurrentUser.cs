@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Auth.DTOs;
 using Application.Services;
+using Application.Utilities;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -34,12 +35,12 @@ public class GetCurrentUser
             var email = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
 
             if (string.IsNullOrEmpty(email))
-                return Result<UserDto>.Failure("Unauthorized", 401);
+                return Result<UserDto>.Failure(MessageGenerator.Unauthorized(), 401);
 
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user is null)
-                return Result<UserDto>.Failure("User not found", 404);
+                return Result<UserDto>.Failure(MessageGenerator.NotFound("User"), 404);
 
             var userDto = new UserDto
             {

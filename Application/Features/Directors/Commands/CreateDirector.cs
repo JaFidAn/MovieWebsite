@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Directors.DTOs;
 using Application.Repositories.DirectorRepository;
+using Application.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -39,7 +40,7 @@ public class CreateDirector
 
             if (existing is not null)
             {
-                return Result<string>.Failure("Director with the same name already exists", 400);
+                return Result<string>.Failure(MessageGenerator.DuplicateExists("Director"), 400);
             }
 
             var director = _mapper.Map<Director>(request.DirectorDto);
@@ -49,10 +50,10 @@ public class CreateDirector
 
             if (!result)
             {
-                return Result<string>.Failure("Director could not be created", 400);
+                return Result<string>.Failure(MessageGenerator.CreationFailed("Director"), 400);
             }
 
-            return Result<string>.Success(director.Id, "Director added successfully");
+            return Result<string>.Success(director.Id, MessageGenerator.CreationSuccess("Director"));
         }
     }
 }

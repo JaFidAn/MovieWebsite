@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Directors.DTOs;
 using Application.Repositories.DirectorRepository;
+using Application.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -35,7 +36,7 @@ public class GetDirectorDetails
 
             if (director is null)
             {
-                return Result<DirectorDto>.Failure("Director not found", 404);
+                return Result<DirectorDto>.Failure(MessageGenerator.NotFound("Director"), 404);
             }
 
             return Result<DirectorDto>.Success(director);

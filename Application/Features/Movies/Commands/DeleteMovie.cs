@@ -1,5 +1,6 @@
 using Application.Core;
 using Application.Repositories.MovieRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,7 @@ public class DeleteMovie
 
             if (movie is null)
             {
-                return Result<Unit>.Failure("Movie not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Movie"), 404);
             }
 
             _movieWriteRepository.RemoveMovieGenres(movie);
@@ -46,10 +47,10 @@ public class DeleteMovie
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to delete movie", 400);
+                return Result<Unit>.Failure(MessageGenerator.DeletionFailed("movie"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Movie deleted successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.DeletionSuccess("Movie"));
         }
     }
 }

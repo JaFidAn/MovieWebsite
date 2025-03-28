@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Directors.DTOs;
 using Application.Repositories.DirectorRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ public class EditDirector
 
             if (director is null)
             {
-                return Result<Unit>.Failure("Director not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Director"), 404);
             }
 
             var duplicate = await _directorReadRepository
@@ -43,7 +44,7 @@ public class EditDirector
 
             if (duplicate is not null)
             {
-                return Result<Unit>.Failure("Another director with the same name already exists", 400);
+                return Result<Unit>.Failure(MessageGenerator.DuplicateExists("Director"), 400);
             }
 
             director.FullName = request.DirectorDto.FullName;
@@ -52,10 +53,10 @@ public class EditDirector
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to update director", 400);
+                return Result<Unit>.Failure(MessageGenerator.UpdateFailed("Director"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Director updated successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.UpdateSuccess("Director"));
         }
     }
 }

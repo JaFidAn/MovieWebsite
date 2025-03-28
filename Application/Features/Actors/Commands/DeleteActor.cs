@@ -1,5 +1,6 @@
 using Application.Core;
 using Application.Repositories.ActorRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ public class DeleteActor
 
             if (actor is null)
             {
-                return Result<Unit>.Failure("Actor not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Actor"), 404);
             }
 
             actor.IsDeleted = true;
@@ -42,10 +43,10 @@ public class DeleteActor
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to delete actor", 400);
+                return Result<Unit>.Failure(MessageGenerator.DeletionFailed("Actor"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Actor deleted successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.DeletionSuccess("Actor"));
         }
     }
 }
