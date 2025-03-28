@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Auth.DTOs;
 using Application.Services;
+using Application.Utilities;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -39,12 +40,12 @@ public class Register
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return Result<string>.Failure($"Registration failed: {errors}", 400);
+                return Result<string>.Failure(MessageGenerator.RegistrationFailed(errors), 400);
             }
 
             var token = await _tokenService.CreateToken(user);
 
-            return Result<string>.Success(token, "Registration successful");
+            return Result<string>.Success(token, MessageGenerator.RegistrationSuccess());
         }
     }
 }

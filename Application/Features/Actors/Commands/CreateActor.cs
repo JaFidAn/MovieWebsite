@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Actors.DTOs;
 using Application.Repositories.ActorRepository;
+using Application.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -39,7 +40,7 @@ public class CreateActor
 
             if (existing is not null)
             {
-                return Result<string>.Failure("Actor with the same name already exists", 400);
+                return Result<string>.Failure(MessageGenerator.DuplicateExists("Actor"), 400);
             }
 
             var actor = _mapper.Map<Actor>(request.ActorDto);
@@ -49,10 +50,10 @@ public class CreateActor
 
             if (!result)
             {
-                return Result<string>.Failure("Actor could not be created", 400);
+                return Result<string>.Failure(MessageGenerator.CreationFailed("Actor"), 400);
             }
 
-            return Result<string>.Success(actor.Id, "Actor added successfully");
+            return Result<string>.Success(actor.Id, MessageGenerator.CreationSuccess("Actor"));
         }
     }
 }

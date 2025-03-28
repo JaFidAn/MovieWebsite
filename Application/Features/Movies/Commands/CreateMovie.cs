@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Utilities;
 
 namespace Application.Features.Movies.Commands;
 
@@ -43,14 +44,14 @@ public class CreateMovie
                 .ToListAsync(cancellationToken);
 
             if (genreList.Count != request.MovieDto.GenreIds.Count)
-                return Result<string>.Failure("One or more genres are invalid", 400);
+                return Result<string>.Failure(MessageGenerator.InvalidEntities("genre"), 400);
 
             var actorList = await _actorReadRepository
                 .GetWhere(a => request.MovieDto.ActorIds.Contains(a.Id) && !a.IsDeleted)
                 .ToListAsync(cancellationToken);
 
             if (actorList.Count != request.MovieDto.ActorIds.Count)
-                return Result<string>.Failure("One or more actors are invalid", 400);
+                return Result<string>.Failure(MessageGenerator.InvalidEntities("actor"), 400);
 
             var movie = _mapper.Map<Movie>(request.MovieDto);
             movie.DirectorId = request.MovieDto.DirectorId;
@@ -67,9 +68,9 @@ public class CreateMovie
             var result = await _movieWriteRepository.SaveAsync() > 0;
 
             if (!result)
-                return Result<string>.Failure("Movie could not be created", 400);
+                return Result<string>.Failure(MessageGenerator.CreationFailed("Movie"), 400);
 
-            return Result<string>.Success(movie.Id, "Movie added successfully");
+            return Result<string>.Success(movie.Id, MessageGenerator.CreationSuccess("Movie"));
         }
     }
 }

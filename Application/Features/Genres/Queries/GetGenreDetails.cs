@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Genres.DTOs;
 using Application.Repositories.GenreRepository;
+using Application.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -35,7 +36,7 @@ public class GetGenreDetails
 
             if (genre is null)
             {
-                return Result<GenreDto>.Failure("Genre not found", 404);
+                return Result<GenreDto>.Failure(MessageGenerator.NotFound("Genre"), 404);
             }
 
             return Result<GenreDto>.Success(genre);

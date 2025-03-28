@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Actors.DTOs;
 using Application.Repositories.ActorRepository;
+using Application.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -35,7 +36,7 @@ public class GetActorDetails
 
             if (actor is null)
             {
-                return Result<ActorDto>.Failure("Actor not found", 404);
+                return Result<ActorDto>.Failure(MessageGenerator.NotFound("Actor"), 404);
             }
 
             return Result<ActorDto>.Success(actor);

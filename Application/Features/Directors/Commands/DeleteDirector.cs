@@ -1,5 +1,6 @@
 using Application.Core;
 using Application.Repositories.DirectorRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ public class DeleteDirector
 
             if (director is null)
             {
-                return Result<Unit>.Failure("Director not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Director"), 404);
             }
 
             director.IsDeleted = true;
@@ -42,10 +43,10 @@ public class DeleteDirector
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to delete director", 400);
+                return Result<Unit>.Failure(MessageGenerator.DeletionFailed("Director"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Director deleted successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.DeletionSuccess("Director"));
         }
     }
 }

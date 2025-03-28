@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Utilities;
 
 namespace Application.Features.Movies.Commands;
 
@@ -49,7 +50,7 @@ public class EditMovie
 
             if (movie is null)
             {
-                return Result<Unit>.Failure("Movie not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Movie"), 404);
             }
 
             var genres = await _genreReadRepository
@@ -58,7 +59,7 @@ public class EditMovie
 
             if (genres.Count != request.MovieDto.GenreIds.Count)
             {
-                return Result<Unit>.Failure("One or more genres are invalid", 400);
+                return Result<Unit>.Failure(MessageGenerator.InvalidEntities("genre"), 400);
             }
 
             var actors = await _actorReadRepository
@@ -67,7 +68,7 @@ public class EditMovie
 
             if (actors.Count != request.MovieDto.ActorIds.Count)
             {
-                return Result<Unit>.Failure("One or more actors are invalid", 400);
+                return Result<Unit>.Failure(MessageGenerator.InvalidEntities("actor"), 400);
             }
 
             _movieWriteRepository.RemoveMovieGenres(movie);
@@ -87,10 +88,10 @@ public class EditMovie
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to update movie", 400);
+                return Result<Unit>.Failure(MessageGenerator.UpdateFailed("movie"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Movie updated successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.UpdateSuccess("Movie"));
         }
     }
 }

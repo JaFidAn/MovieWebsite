@@ -46,4 +46,11 @@ public class MoviesController : BaseApiController
     {
         return await Mediator.Send(new GetMovieSearchResults.Query { Params = queryParams });
     }
+
+    [AllowAnonymous]
+    [HttpGet("external")]
+    public async Task<ActionResult<List<ExternalMovieDto>>> GetExternalMovies()
+    {
+        return HandleResult(await Mediator.Send(new GetExternalMovies.Query()));
+    }
 }

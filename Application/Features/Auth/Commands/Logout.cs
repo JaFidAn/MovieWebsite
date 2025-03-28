@@ -1,5 +1,6 @@
 using Application.Core;
 using Application.Services;
+using Application.Utilities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -34,7 +35,7 @@ public class Logout
 
             await _tokenService.RevokeTokenAsync(token);
 
-            return Result<Unit>.Success(Unit.Value, "Logged out successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.LogoutSuccess());
         }
     }
 }

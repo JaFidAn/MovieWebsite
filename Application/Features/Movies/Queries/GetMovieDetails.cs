@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Movies.DTOs;
 using Application.Repositories.MovieRepository;
+using Application.Utilities;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ public class GetMovieDetails
 
             if (movie is null)
             {
-                return Result<MovieDetailsDto>.Failure("Movie not found", 404);
+                return Result<MovieDetailsDto>.Failure(MessageGenerator.NotFound("Movie"), 404);
             }
 
             var dto = _mapper.Map<MovieDetailsDto>(movie);

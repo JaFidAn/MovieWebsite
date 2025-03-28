@@ -1,6 +1,7 @@
 using Application.Core;
 using Application.Features.Actors.DTOs;
 using Application.Repositories.ActorRepository;
+using Application.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ public class EditActor
 
             if (actor is null)
             {
-                return Result<Unit>.Failure("Actor not found", 404);
+                return Result<Unit>.Failure(MessageGenerator.NotFound("Actor"), 404);
             }
 
             var duplicate = await _actorReadRepository
@@ -43,7 +44,7 @@ public class EditActor
 
             if (duplicate is not null)
             {
-                return Result<Unit>.Failure("Another actor with the same name already exists", 400);
+                return Result<Unit>.Failure(MessageGenerator.DuplicateExists("Actor"), 400);
             }
 
             actor.FullName = request.ActorDto.FullName;
@@ -52,10 +53,10 @@ public class EditActor
 
             if (!result)
             {
-                return Result<Unit>.Failure("Failed to update actor", 400);
+                return Result<Unit>.Failure(MessageGenerator.UpdateFailed("Actor"), 400);
             }
 
-            return Result<Unit>.Success(Unit.Value, "Actor updated successfully");
+            return Result<Unit>.Success(Unit.Value, MessageGenerator.UpdateSuccess("Actor"));
         }
     }
 }
